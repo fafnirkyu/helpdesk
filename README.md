@@ -64,7 +64,6 @@ It’s designed as a **real-world portfolio project**, demonstrating full-stack 
     "summary": "User reports duplicate charge",
     "response": "I understand you were charged twice — let's resolve that right away."
   }
-```
 
 Uses RAG (Retrieval-Augmented Generation) for more context-aware outputs.
 
