@@ -6,7 +6,7 @@ from backend import schemas, service
 from tests.debug_logger import log_debug
 import os
 
-load_dotenv(".enviorment")
+load_dotenv(".env")
 ZENDESK_SUBDOMAIN = os.getenv("ZENDESK_SUBDOMAIN")
 ZENDESK_EMAIL = os.getenv("ZENDESK_EMAIL")
 ZENDESK_TOKEN = os.getenv("ZENDESK_TOKEN")

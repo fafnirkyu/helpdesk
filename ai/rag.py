@@ -6,7 +6,6 @@ import re
 import numpy as np
 from numpy.linalg import norm
 from sentence_transformers import SentenceTransformer
-from ai.hf_client import classify_with_llm_detailed as classify_with_llm
 from sentence_transformers import SentenceTransformer, util
 import numpy as np, os, pandas as pd
 
@@ -117,10 +116,6 @@ def classify_ticket(message: str):
     emb_cat, conf = classify_with_embeddings(message)
     if conf >= 0.55:
         return emb_cat, conf
-
-    # 3. Fallback to AI model
-    llm_cat = classify_with_llm(message)
-    return llm_cat, 0.5
 
 # Retrieve knowledge base entries similar to the query
 def retrieve_knowledge(query: str, top_k: int = 3) -> list:

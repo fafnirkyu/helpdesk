@@ -1,10 +1,10 @@
-from ai.rag import retrieve_examples
-from ai.hf_client import get_hf_client
-from ai.schemas import HelpdeskTicket
 import time
 import re
 import unicodedata
 import threading
+from ai.rag import retrieve_examples
+from ai.hf_client import get_hf_client, classify_with_llm_detailed
+from ai.schemas import HelpdeskTicket
 from ai.sentiment import detect_sentiment
 
 # Clean text for consistency
@@ -35,62 +35,45 @@ class RobustAnalyzer:
 
 _analyzer = RobustAnalyzer()
 
-
 # Main pipeline function
 def full_ticket_analysis(ticket_text: str) -> dict:
-    from ai.hf_client import get_hf_client
-    from ai.rag import retrieve_examples
     start = time.time()
     ticket_text = clean_text(ticket_text)
-    print(f"Processing: {ticket_text[:100]}...")
-
+    
     try:
+        # Rate limiting
         _analyzer.wait()
 
-        # Retrieve RAG examples
+        # STEP 1: RAG Specialist finds similar cases
         examples = retrieve_examples(ticket_text, top_k=3)
-        context = "\n".join([f"- {e['instruction']} => {e['response']}" for e in examples])
 
-        # Construct contextual prompt
-        prompt = f"""
-You are an expert helpdesk classifier.
-Use these examples as context:
-{context}
+        # STEP 2: Sentiment Specialist checks the mood
+        sentiment = detect_sentiment(ticket_text)
 
-Ticket: "{ticket_text}"
+        # STEP 3: LLM Specialist does the classification
+        # We pass the message AND the examples. The prompt is built INSIDE this call.
+        ai_result = classify_with_llm_detailed(ticket_text, examples=examples)
 
-Return ONLY JSON with:
-{{
-  "category": "ACCOUNT|ORDER|BILLING|TECHNICAL|SUBSCRIPTION|OTHER",
-  "subcategory": "specific_issue_type",
-  "summary": "short summary",
-  "response": "helpful short reply"
-}}
-"""
-
-        print(f"📤 Sending to AI...")
-        client = get_hf_client()
-        ai_result = client.generate_json(prompt)
-
-        # Apply rule corrections and ensemble refinement
+        # STEP 4: Business Logic (The Boss's final checks)
         corrected = _force_category_correction(ticket_text, ai_result)
         final_cat = _ensemble_decision(ticket_text, corrected["category"])
+        
+        # Merge all findings
         corrected["category"] = final_cat
+        corrected["sentiment"] = sentiment
 
-        # Validate final structure
+        # STEP 5: Production-grade validation
         validated = HelpdeskTicket(**corrected)
         final = validated.model_dump()
 
-        print(f"✅ Final: {final['category']} - {final['subcategory']}")
         return final
 
     except Exception as e:
-        print(f"AI analysis failed: {e}")
+        print(f"❌ AI analysis failed: {e}")
         return _keyword_fallback(ticket_text)
     finally:
-        elapsed = time.time() - start
-        print(f"Total time: {elapsed:.2f}s")
-    
+        print(f"⏱️ Total time: {time.time() - start:.2f}s")
+        
 # Correction logic for common misclassifications
 def _force_category_correction(original_text: str, ai_result: dict) -> dict:
     text_lower = original_text.lower()
