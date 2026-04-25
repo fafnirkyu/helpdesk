@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 
 # Load environment if needed
-load_dotenv("backend/.enviorment")
+load_dotenv(".env")
 
 DB_PATH = os.getenv("DATABASE_URL", "sqlite:///./data/tickets.db").replace("sqlite:///", "")
 
