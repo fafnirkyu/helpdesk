@@ -24,7 +24,7 @@ def get_cpp_client():
             print(f"Loading Llama-CPP Model: {model_path}...")
             _LLM_INSTANCE = Llama(
                 model_path=model_path,
-                n_ctx=2048,      # Context window size
+                n_ctx=1024,      # Context window size
                 n_threads=2,     # Adjust based on Railway CPU cores
                 verbose=False    # Keeps logs clean
             )
