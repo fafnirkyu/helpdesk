@@ -1,7 +1,7 @@
 import os
 import requests
 
-MODEL_URL = "https://huggingface.co/second-state/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-Q8_0.gguf"
+MODEL_URL = "https://huggingface.co/bartowski/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-Q8_0.gguf"
 SAVE_PATH = "models/smollm2-135m-instruct-q8_0.gguf"
 
 def download():
