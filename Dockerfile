@@ -32,7 +32,7 @@ RUN mkdir -p models
 # These tell your app where it's running
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
-ENV MODEL_PATH="models/smollm2-135m-instruct-q8_0.gguf"
+ENV MODEL_PATH="models/models/smollm2-135m-instruct-q8_0.gguf"
 
 # 7. Expose the port FastAPI will run on
 EXPOSE 8000

@@ -15,7 +15,7 @@ def get_cpp_client():
     with _MODEL_LOCK:
         if _LLM_INSTANCE is None:
             # Look for model in a 'models' folder
-            model_path = os.getenv("MODEL_PATH", "models/llama-3.2-3b-instruct.Q4_K_M.gguf")
+            model_path = os.getenv("MODEL_PATH", "models/models/smollm2-135m-instruct-q8_0.gguf")
             
             if not os.path.exists(model_path):
                 print(f"Model not found at {model_path}. Fallback to keyword mode.")
