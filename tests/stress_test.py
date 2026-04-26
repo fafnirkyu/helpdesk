@@ -6,8 +6,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from statistics import mean
 from collections import Counter
 
-API_URL = "http://127.0.0.1:8000/tickets"
-POLL_URL = "http://127.0.0.1:8000/ticket/{}"
+API_URL = "https://helpdesk-production-95e4.up.railway.app/tickets"
+POLL_URL = "https://helpdesk-production-95e4.up.railway.app/ticket/{}"
 
 # Realistic support tickets for Zendesk integration
 TICKETS = [

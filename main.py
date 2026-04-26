@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import backend.database as database
 from backend import schemas, service
-from tests.debug_logger import log_debug
+from backend.tests.debug_logger import log_debug
 import os
 
 load_dotenv(".env")

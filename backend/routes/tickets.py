@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
-from backend import schemas, crud, database
-from ai import classifier, summarizer, responder
+from backend import schemas, crud, database, service  # Added service
 
 router = APIRouter()
 
-@router.post("/tickets", response_model=schemas.Ticket)
-def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(database.get_db)):
-    category = classifier.classify_ticket(ticket.description)
-    summary = summarizer.summarize_ticket(ticket.description)
-    ai_reply = responder.generate_response(ticket.description)
-
-    return crud.create_ticket(db=db, ticket=ticket, category=category, summary=summary, ai_reply=ai_reply)
+@router.post("/tickets", response_model=schemas.TicketResponse)
+async def create_ticket(
+    ticket: schemas.TicketCreate, 
+    background_tasks: BackgroundTasks, 
+    db: Session = Depends(database.get_db)
+):
+    db_ticket = crud.create_ticket_initial(db=db, ticket=ticket)
+    background_tasks.add_task(service.analyze_ticket_service, db_ticket.id)
+    return db_ticket
