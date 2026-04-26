@@ -3,7 +3,7 @@ import re
 import unicodedata
 import threading
 from ai.rag import retrieve_examples
-from ai.hf_client import get_hf_client, classify_with_llm_detailed
+from ai.hf_client import classify_with_llm_detailed
 from ai.schemas import HelpdeskTicket
 from ai.sentiment import detect_sentiment
 

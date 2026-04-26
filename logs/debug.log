@@ -951,3 +951,11 @@ ValueError: Strings not allowed in this test
 2025-10-14 07:46:24 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ File logging enabled (rotating)
 2025-10-14 07:46:24 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ Debug logger initialized successfully
 2025-10-14 07:48:53 [DEBUG   ] [MainThread] ultra_robust_debug:144 - FastAPI starting up...
+2026-04-26 06:28:56 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ File logging enabled (rotating)
+2026-04-26 06:28:56 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ Debug logger initialized successfully
+2026-04-26 11:20:27 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ File logging enabled (rotating)
+2026-04-26 11:20:27 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ Debug logger initialized successfully
+2026-04-26 11:20:27 [DEBUG   ] [MainThread] ultra_robust_debug:144 - FastAPI starting up...
+2026-04-26 11:24:40 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ File logging enabled (rotating)
+2026-04-26 11:24:40 [INFO    ] [MainThread] ultra_robust_debug:98 - ✅ Debug logger initialized successfully
+2026-04-26 11:24:41 [DEBUG   ] [MainThread] ultra_robust_debug:144 - FastAPI starting up...

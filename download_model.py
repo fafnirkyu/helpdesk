@@ -16,7 +16,7 @@ def download():
         with open(SAVE_PATH, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
-    print("✨ Download complete.")
+    print("Download complete.")
 
 if __name__ == "__main__":
     download()

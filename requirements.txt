@@ -41,3 +41,4 @@ llama-cpp-python
 requests
 pydantic
 streamlit-autorefresh
+hf_xet
