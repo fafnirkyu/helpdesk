@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import backend.database as database
 from backend import schemas, service
-from backend.tests.debug_logger import log_debug
+from tests.debug_logger import log_debug
 import os
 
 load_dotenv(".env")
@@ -18,6 +18,10 @@ def on_startup():
     log_debug("FastAPI starting up...")
     # only initialize DB schema here. Do NOT analyze tickets by default.
     database.init_db()
+
+@app.get("/")
+def read_root():
+    return {"status": "online", "message": "Helpdesk AI is running. Visit /docs for the API."}
 
 @app.post("/tickets", response_model=schemas.TicketResponse)
 def create_ticket(

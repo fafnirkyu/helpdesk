@@ -1,32 +1,8 @@
 [
   {
-    "message": "You charged me twice for my last purchase on March 15th.",
-    "status": 502,
-    "elapsed": 15.48,
-    "category": "?",
-    "expected": "BILLING",
-    "correct": false
-  },
-  {
-    "message": "The mobile app keeps crashing when I open it on iOS.",
-    "status": 502,
-    "elapsed": 15.32,
-    "category": "?",
-    "expected": "TECHNICAL",
-    "correct": false
-  },
-  {
-    "message": "I can't log into my account after resetting my password.",
-    "status": 502,
-    "elapsed": 15.31,
-    "category": "?",
-    "expected": "ACCOUNT",
-    "correct": false
-  },
-  {
     "message": "My order #12345 hasn't arrived after 2 weeks.",
     "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.5,
     "category": "?",
     "expected": "ORDER",
     "correct": false
@@ -34,33 +10,41 @@
   {
     "message": "I want to cancel my premium subscription immediately.",
     "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.33,
     "category": "?",
     "expected": "SUBSCRIPTION",
     "correct": false
   },
   {
-    "message": "I received a damaged product in my order from yesterday.",
+    "message": "I can't log into my account after resetting my password.",
     "status": 502,
-    "elapsed": 15.31,
-    "category": "?",
-    "expected": "ORDER",
-    "correct": false
-  },
-  {
-    "message": "I updated my email but verification isn't working.",
-    "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.33,
     "category": "?",
     "expected": "ACCOUNT",
     "correct": false
   },
   {
-    "message": "My payment was declined but my card has sufficient funds.",
+    "message": "You charged me twice for my last purchase on March 15th.",
+    "status": 502,
+    "elapsed": 15.33,
+    "category": "?",
+    "expected": "BILLING",
+    "correct": false
+  },
+  {
+    "message": "The mobile app keeps crashing when I open it on iOS.",
     "status": 502,
     "elapsed": 15.31,
     "category": "?",
-    "expected": "BILLING",
+    "expected": "TECHNICAL",
+    "correct": false
+  },
+  {
+    "message": "I received a damaged product in my order from yesterday.",
+    "status": 502,
+    "elapsed": 15.3,
+    "category": "?",
+    "expected": "ORDER",
     "correct": false
   },
   {
@@ -72,6 +56,22 @@
     "correct": false
   },
   {
+    "message": "My payment was declined but my card has sufficient funds.",
+    "status": 502,
+    "elapsed": 15.31,
+    "category": "?",
+    "expected": "BILLING",
+    "correct": false
+  },
+  {
+    "message": "I updated my email but verification isn't working.",
+    "status": 502,
+    "elapsed": 15.31,
+    "category": "?",
+    "expected": "ACCOUNT",
+    "correct": false
+  },
+  {
     "message": "How can I change my shipping address for order #67890?",
     "status": 502,
     "elapsed": 15.31,
@@ -80,25 +80,25 @@
     "correct": false
   },
   {
-    "message": "The live chat feature isn't loading on your website.",
-    "status": 502,
-    "elapsed": 15.32,
-    "category": "?",
-    "expected": "TECHNICAL",
-    "correct": false
-  },
-  {
     "message": "I got 'invalid promo code' error with code SAVE20.",
     "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.31,
     "category": "?",
     "expected": "BILLING",
     "correct": false
   },
   {
+    "message": "The live chat feature isn't loading on your website.",
+    "status": 502,
+    "elapsed": 15.33,
+    "category": "?",
+    "expected": "TECHNICAL",
+    "correct": false
+  },
+  {
     "message": "When does my annual subscription automatically renew?",
     "status": 502,
-    "elapsed": 15.34,
+    "elapsed": 15.31,
     "category": "?",
     "expected": "SUBSCRIPTION",
     "correct": false
@@ -106,7 +106,7 @@
   {
     "message": "Can I get an invoice for my purchase last week?",
     "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.33,
     "category": "?",
     "expected": "BILLING",
     "correct": false
@@ -120,7 +120,7 @@
     "correct": false
   },
   {
-    "message": "The refund for my cancelled order hasn't processed.",
+    "message": "I can't add my credit card - says invalid card number.",
     "status": 502,
     "elapsed": 15.31,
     "category": "?",
@@ -130,17 +130,25 @@
   {
     "message": "I forgot my username and recovery email isn't working.",
     "status": 502,
-    "elapsed": 15.32,
+    "elapsed": 15.31,
     "category": "?",
     "expected": "ACCOUNT",
     "correct": false
   },
   {
-    "message": "I can't add my credit card - says invalid card number.",
+    "message": "The refund for my cancelled order hasn't processed.",
     "status": 502,
     "elapsed": 15.31,
     "category": "?",
     "expected": "BILLING",
+    "correct": false
+  },
+  {
+    "message": "My account was locked after multiple failed login attempts.",
+    "status": 502,
+    "elapsed": 15.31,
+    "category": "?",
+    "expected": "ACCOUNT",
     "correct": false
   },
   {
@@ -149,14 +157,6 @@
     "elapsed": 15.31,
     "category": "?",
     "expected": "ORDER",
-    "correct": false
-  },
-  {
-    "message": "My account was locked after multiple failed login attempts.",
-    "status": 502,
-    "elapsed": 15.32,
-    "category": "?",
-    "expected": "ACCOUNT",
     "correct": false
   }
 ]

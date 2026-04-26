@@ -40,3 +40,4 @@ torch --index-url https://download.pytorch.org/whl/cpu
 llama-cpp-python
 requests
 pydantic
+streamlit-autorefresh
