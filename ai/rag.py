@@ -10,8 +10,9 @@ from sentence_transformers import SentenceTransformer, util
 import numpy as np, os, pandas as pd
 
 EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+EMB_PATH = "data/kb_embs.npz"
 KB_PATH = os.path.join("data","bitext.csv")
-kb = pd.read_csv(KB_PATH) 
+kb = pd.read_csv(KB_PATH)
 DATA_PATH = os.path.join("data", "bitext.csv")
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -24,7 +25,7 @@ if not os.path.exists("data/kb_embs.npz"):
     embs = EMBED_MODEL.encode(kb["instruction"].tolist(), convert_to_tensor=False)
     np.savez("data/kb_embs.npz", embs=embs)
 else:
-    embs = np.load("data/kb_embs.npz")["embs"]
+    embs = np.load("data/kb_embs.npz", mmap_mode='r')["embs"]
 
 kb = pd.read_csv(DATA_PATH)
 
