@@ -26,8 +26,7 @@ if not os.path.exists("data/kb_embs.npz"):
     np.savez("data/kb_embs.npz", embs=embs)
 else:
     data = np.load("data/kb_embs.npz", mmap_mode='r')
-    print("Files in archive:", data.files)
-    embs = data[data.files[0]]
+    embs = data["embeddings"]
 
 kb = pd.read_csv(DATA_PATH)
 
