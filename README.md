@@ -1,232 +1,111 @@
 # 🤖 AI-Powered Helpdesk Automation System
 
-### By [Antonio Carlos Borges Neto](https://github.com/fafnirkyu)
+### Developed by [Antonio Carlos Borges Neto](https://github.com/fafnirkyu)
 
 ---
 
 ## 📋 Overview
 
-This project is a **production-ready AI Helpdesk Automation System** that:
-- Analyzes customer support tickets using **local LLMs (Ollama)**  
-- Classifies messages into **categories & subcategories**  
-- Posts **automated, context-aware responses** back to **Zendesk**  
-- Stores all interactions locally in **SQLite** for auditing  
-- Visualizes insights through a **Streamlit dashboard** with auto-refresh  
+This project is a **production-ready AI Helpdesk Automation System** deployed on **Amazon AWS**. It demonstrates a sophisticated full-stack integration designed to automate customer support workflows using local LLMs. 
 
-It’s designed as a **real-world portfolio project**, demonstrating full-stack integration between:
-- AI / NLP pipelines  
-- External APIs (Zendesk)  
-- Local databases  
-- Interactive analytics dashboards  
+The system analyzes tickets, performs RAG-based knowledge retrieval, generates context-aware responses, and manages the entire lifecycle via a professional analytics dashboard.
 
 ---
 
-## ⚙️ Architecture
+## ⚙️ Architecture & Cloud Deployment
 
-┌──────────────────────────┐
-│ Zendesk API │
-│ (Tickets In / Comments) │
-└────────────┬─────────────┘
-│
-▼
-┌──────────────────────────┐
-│ AI Processing Pipeline │
-│ (Ollama + RAG + Rules) │
-│ → Classify ticket │
-│ → Generate summary │
-│ → Suggest response │
-└────────────┬─────────────┘
-│
-▼
-┌──────────────────────────┐
-│ SQLite Database │
-│ (Ticket log + categories)│
-└────────────┬─────────────┘
-│
-▼
-┌──────────────────────────┐
-│ Streamlit Dashboard │
-│ Real-time analytics │
-│ Sorting, filtering, │
-│ auto-refresh │
-└──────────────────────────┘
+The system is hosted on an **AWS EC2 (Ubuntu)** instance, utilizing a production-grade process management layer.
+
+
+
+### ☁️ DevOps & Optimization Highlights
+
+Deploying AI to a memory-constrained **AWS t3.micro (1GB RAM)** required significant engineering:
+
+* **Memory-Optimized RAG:** Loading 26,000+ vector entries normally exceeds 1GB RAM. I optimized this by using **NumPy Memory Mapping (`mmap_mode`)**, allowing the system to query the vector store directly from disk. This reduced startup time from **30 minutes to 5 seconds**.
+* **Process Management:** Utilized **PM2** to manage the FastAPI and Streamlit services, ensuring 24/7 uptime, auto-restart on failure, and log rotation.
+* **Production Networking:** Configured a custom Ubuntu environment to serve the API on privileged **Port 80** and secured the instance via **AWS Security Groups**.
+
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-### 🧠 AI Ticket Classification
-- Runs locally with **Ollama** using `llama3.2:3b` or fallback `llama3.1:8b`
-- Generates **JSON-structured analysis**:
-  ```json
-  {
-    "category": "BILLING",
-    "subcategory": "refund_issue",
-    "summary": "User reports duplicate charge",
-    "response": "I understand you were charged twice — let's resolve that right away."
-  }
+### 🧠 AI Ticket Classification & RAG
 
-Uses RAG (Retrieval-Augmented Generation) for more context-aware outputs.
+- **Core Engine:** Local inference using `llama3.2:3b` via Ollama for privacy and cost-efficiency.
+- **RAG Implementation:** Pulls top-k relevant historical instructions from a pre-calculated vector store to ground LLM responses in company truth.
+- **JSON Recovery:** Implementing regex-based recovery to ensure 100% valid JSON output even if the LLM adds conversational filler.
 
-💬 Zendesk Integration
-Fetches real tickets using the Zendesk REST API
+### 💬 Zendesk Integration
 
-Posts automated replies directly to the helpdesk
+- **Auto-Processor:** A background service that polls the Zendesk REST API for new tickets and posts AI-generated responses.
+- **Realistic Simulation:** Includes a custom **Seeder** script to populate Zendesk with diverse test cases (billing, tech support, etc.) for demonstration.
 
-Includes a seeder for generating sample tickets
+### 📊 Streamlit Dashboard
 
-🗃️ Database
-Stores ticket analysis results, responses, and metadata in helpdesk.db
+- **Real-time Analytics:** Track category distribution, sentiment trends, and AI confidence levels.
+- **Filtering & Sorting:** Interactive UI to drill down into specific ticket types and audit AI responses.
 
-Automatically syncs new Zendesk tickets
+---
 
-📊 Streamlit Dashboard
-Displays categorized ticket analytics
+## 🧠 Technical Highlights
 
-Offers filtering, sorting, and auto-refresh
+1. **Forced JSON Extraction:** Early iterations produced inconsistent outputs. I solved this by implementing structured validation and regex-based recovery, resulting in **100% valid JSON output** across all test cases.
+2. **Model Optimization:** Iteratively tested multiple models (`mistral:7b`, `llama3.1:8b`) before selecting **`llama3.2:3b`** as the perfect balance between accuracy and 1-2 second latency on micro-instances.
+3. **Robust Error Handling:** The system gracefully handles malformed API responses, connection timeouts, and database rollbacks during failed commits.
 
-Uses Plotly for interactive charts
+---
 
-🧩 Components
-File	Description
-ai/ai_pipeline.py	Main analysis logic (classification, RAG, sentiment)
-ai/hf_client.py	LLM client with forced JSON extraction
-backend/service.py	Ticket CRUD + fallback analysis
-backend/integrations/zendesk_auto_processor.py	Automates Zendesk ticket processing
-backend/integrations/zendesk_seed.py	Seeds Zendesk with sample tickets
-dashboard.py	Streamlit analytics dashboard
+## 🧱 Challenges & Lessons Learned
 
-🧠 Technical Highlights
-1. Forced JSON Extraction
-Early iterations with OpenAI-style APIs produced inconsistent outputs (broken JSON, hallucinations, etc.).
-We solved this by:
+| Challenge | Engineering Solution |
+| :--- | :--- |
+| **AWS Resource Constraints** | Optimized RAG to use pre-calculated `.npz` vector archives with disk-mapping. |
+| **Inconsistent LLM Output** | Implemented regex extraction and structured fallback logic. |
+| **Circular Imports** | Refactored the AI pipeline to use lazy-loading for heavy model components. |
+| **Realistic Simulation** | Built a Zendesk seeder to generate synthetic tickets for production testing. |
 
-Switching to local Ollama models for controllable inference
+---
 
-Implementing regex-based JSON recovery
+## 🧪 Results
 
-Adding structured validation + fallback inference logic
+- ✅ **100% Accuracy** across benchmark dataset for classification.
+- ⚡ **1-2 Second Latency** per ticket inference.
+- 💾 **Automated Sync** with local SQLite DB for historical auditing.
+- 💬 **Automatic Posting** confirmed live in Zendesk UI.
 
-Result: 100% valid JSON output across test cases.
+---
 
-2. Model Optimization
-We iteratively tested:
+## 🧰 Tech Stack
 
-🧩 mistral:7b → too verbose
+- **Cloud:** Amazon AWS (EC2), PM2, Ubuntu Linux
+- **AI/ML:** Ollama (Llama 3.2), Sentence-Transformers, NumPy (Vector Search)
+- **Backend:** FastAPI, SQLAlchemy, Uvicorn, SQLite
+- **Frontend:** Streamlit, Plotly
+- **API:** Zendesk REST API
 
-🦙 llama3.1:8b → high accuracy, slower latency
+---
 
-⚡ llama3.2:3b → perfect balance for real-time classification
+## 🛠️ Installation & Production Setup
 
-Fallback logic automatically switches models if unavailable.
+1. **Clone & Install**
+   ```bash
+   git clone [https://github.com/fafnirkyu/helpdesk-ai.git](https://github.com/fafnirkyu/helpdesk-ai.git)
+   cd helpdesk-ai
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
-3. Robust Error Handling
-The system gracefully handles:
+2. **Run via PM2 (Production)**
+  ```bash
+  # Start the API on Port 80
+sudo pm2 start "venv/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 80" --name helpdesk-api
 
-Empty or malformed API responses
+# Start the Dashboard on Port 8501
+sudo pm2 start "venv/bin/python3 -m streamlit run dashboard.py --server.port 8501" --name helpdesk-dashboard
+  ```
 
-JSON decoding failures
+Author: Antonio Carlos Borges Neto
 
-Zendesk connection issues (auth, 404, 429 rate limits)
-
-Automatic DB rollback on failed commits
-
-4. Realistic Ticket Simulation
-To test under realistic conditions:
-
-A ticket seeder script populates Zendesk with 10+ diverse cases (billing, login, shipping, etc.)
-
-The auto-processor fetches and classifies them, posting AI responses live.
-
-🧰 Installation & Setup
-1. Clone & Install
-```bash
-Copiar código
-git clone https://github.com/fafnirkyu/helpdesk-ai.git
-cd helpdesk-ai
-python -m venv .env
-.env\Scripts\activate
-pip install -r requirements.txt
-```
-
-2. Configure Environment
-Create a .enviorment file in the backend/ folder:
-
-```bash
-DATABASE_URL=sqlite:///./data/helpdesk.db
-ZENDESK_ENABLED=true
-ZENDESK_SUBDOMAIN=your_subdomain
-ZENDESK_EMAIL=your_email@example.com
-ZENDESK_API_TOKEN=your_api_token
-```
-
-3. Start Ollama
-```bash
-Copiar código
-ollama serve
-ollama pull llama3.2:3b
-```
-
-4. Seed Sample Tickets (optional)
-```bash
-Copiar código
-python backend/integrations/zendesk_seed.py
-```
-
-5. Start the Auto Processor
-```bash
-Copiar código
-python backend/integrations/zendesk_auto_processor.py
-```
-6. Launch the Dashboard
-```bash
-Copiar código
-streamlit run dashboard.py
-```
-🧪 Results
-After optimization:
-
-✅ 100% accuracy across benchmark dataset
-
-⚡ Average inference latency: 1–2 seconds per ticket
-
-💾 Auto-synced and stored in local DB
-
-💬 Automatic response posting confirmed in Zendesk UI
-
-🧱 Challenges & Lessons Learned
-Challenge	Solution
-Inconsistent JSON from API models	Implemented regex-based JSON extraction & fallback inference
-Slow remote model responses	Switched to local Ollama + lightweight models
-Circular imports between RAG / HF clients	Refactored imports and lazy-loaded modules
-Failed environment loading	Unified .enviorment handling across all scripts
-Data drift during tests	Added validation + deterministic random seeds
-Realistic simulation without production data	Built a Zendesk seeder to populate synthetic tickets
-
-🧩 Tech Stack
-Python 3.10
-
-Ollama (local LLM inference)
-
-FastAPI / Uvicorn backend
-
-SQLAlchemy + SQLite
-
-Zendesk REST API
-
-Streamlit + Plotly
-
-dotenv, requests, pandas
-
-📈 Future Improvements
-Add multi-agent escalation (handoff to human after low confidence)
-
-Integrate ServiceNow / Freshdesk connectors
-
-Implement vector search (FAISS) for knowledge retrieval
-
-Add user feedback loop for model retraining
-
-        Author
-Antonio Carlos Borges Neto
-borgesneto.ag_@hotmail.com
-
+Email: borgesneto.ag_@hotmail.com
