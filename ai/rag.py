@@ -6,13 +6,13 @@ import re
 import numpy as np
 from numpy.linalg import norm
 from sentence_transformers import SentenceTransformer
-from ai.hf_client import classify_with_llm_detailed as classify_with_llm
 from sentence_transformers import SentenceTransformer, util
 import numpy as np, os, pandas as pd
 
 EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+EMB_PATH = "data/kb_embs.npz"
 KB_PATH = os.path.join("data","bitext.csv")
-kb = pd.read_csv(KB_PATH) 
+kb = pd.read_csv(KB_PATH)
 DATA_PATH = os.path.join("data", "bitext.csv")
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -25,7 +25,8 @@ if not os.path.exists("data/kb_embs.npz"):
     embs = EMBED_MODEL.encode(kb["instruction"].tolist(), convert_to_tensor=False)
     np.savez("data/kb_embs.npz", embs=embs)
 else:
-    embs = np.load("data/kb_embs.npz")["embs"]
+    data = np.load("data/kb_embs.npz", mmap_mode='r')
+    embs = data["embeddings"]
 
 kb = pd.read_csv(DATA_PATH)
 
@@ -117,10 +118,6 @@ def classify_ticket(message: str):
     emb_cat, conf = classify_with_embeddings(message)
     if conf >= 0.55:
         return emb_cat, conf
-
-    # 3. Fallback to AI model
-    llm_cat = classify_with_llm(message)
-    return llm_cat, 0.5
 
 # Retrieve knowledge base entries similar to the query
 def retrieve_knowledge(query: str, top_k: int = 3) -> list:

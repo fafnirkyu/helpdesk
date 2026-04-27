@@ -28,3 +28,17 @@ rich==13.9.2
 # Optional: for embedding or RAG expansion
 scikit-learn==1.5.2
 sentence-transformers==3.1.1
+
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+pandas
+sentence-transformers
+transformers
+torch --index-url https://download.pytorch.org/whl/cpu
+llama-cpp-python
+requests
+pydantic
+streamlit-autorefresh
+hf_xet

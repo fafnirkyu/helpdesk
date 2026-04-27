@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import sqlite3
-import time
 from dotenv import load_dotenv
 import os
+from streamlit_autorefresh import st_autorefresh
 
-# Load environment if needed
-load_dotenv("backend/.enviorment")
+load_dotenv(".env")
 
-DB_PATH = os.getenv("DATABASE_URL", "sqlite:///./data/tickets.db").replace("sqlite:///", "")
+# FIXED: Matched the DB name to 'helpdesk.db' so it actually finds your data
+DB_PATH = os.getenv("DATABASE_URL", "sqlite:///./data/helpdesk.db").replace("sqlite:///", "")
 
 st.set_page_config(
     page_title="Helpdesk AI Dashboard",
@@ -22,7 +22,9 @@ st.caption("Real-time monitoring of Zendesk ticket classification and AI respons
 
 REFRESH_INTERVAL = st.sidebar.slider("Refresh interval (seconds)", 5, 120, 15)
 
-# Connect to database
+# FIXED: Using st_autorefresh instead of a while loop to save RAM
+st_autorefresh(interval=REFRESH_INTERVAL * 1000, key="data_refresh")
+
 def load_tickets():
     try:
         conn = sqlite3.connect(DB_PATH)
@@ -33,57 +35,50 @@ def load_tickets():
         st.error(f"Database load failed: {e}")
         return pd.DataFrame()
 
-# Auto-refresh loop
-placeholder = st.empty()
+# The code just runs once per refresh cycle, no while loop needed.
+df = load_tickets()
 
-while True:
-    with placeholder.container():
-        df = load_tickets()
+if df.empty:
+    st.warning("No tickets found in database yet.")
+else:
+    # Filters
+    categories = df["category"].unique().tolist()
+    selected_cat = st.sidebar.multiselect(
+        "Filter by category",
+        categories,
+        default=categories,
+        key="category_filter"
+    )
 
-        if df.empty:
-            st.warning("No tickets found in database yet.")
-        else:
-            # Filters
-            categories = df["category"].unique().tolist()
-            selected_cat = st.sidebar.multiselect(
-                "Filter by category",
-                categories,
-                default=categories,
-                key="category_filter"
-            )
+    filtered_df = df[df["category"].isin(selected_cat)]
 
-            filtered_df = df[df["category"].isin(selected_cat)]
+    # Sorting
+    sort_col = st.sidebar.selectbox("Sort by", df.columns.tolist(), index=0)
+    ascending = st.sidebar.checkbox("Ascending", value=False)
+    filtered_df = filtered_df.sort_values(by=sort_col, ascending=ascending)
 
-            # Sorting
-            sort_col = st.sidebar.selectbox("Sort by", df.columns.tolist(), index=0)
-            ascending = st.sidebar.checkbox("Ascending", value=False)
-            filtered_df = filtered_df.sort_values(by=sort_col, ascending=ascending)
+    # KPIs
+    total_tickets = len(filtered_df)
+    analyzed = filtered_df["analyzed"].sum() if "analyzed" in filtered_df.columns else total_tickets
 
-            # KPIs
-            total_tickets = len(filtered_df)
-            analyzed = filtered_df["analyzed"].sum() if "analyzed" in filtered_df.columns else total_tickets
+    col1, col2 = st.columns(2)
+    col1.metric("Total Tickets", total_tickets)
+    col2.metric("Analyzed", analyzed)
 
-            col1, col2 = st.columns(2)
-            col1.metric("Total Tickets", total_tickets)
-            col2.metric("Analyzed", analyzed)
+    # Category distribution
+    fig1 = px.bar(
+        filtered_df.groupby("category").size().reset_index(name="count"),
+        x="category",
+        y="count",
+        title="Ticket Distribution by Category",
+        color="category"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
-            # Category distribution
-            fig1 = px.bar(
-                filtered_df.groupby("category").size().reset_index(name="count"),
-                x="category",
-                y="count",
-                title="Ticket Distribution by Category",
-                color="category"
-            )
-            st.plotly_chart(fig1, use_container_width=True)
-
-            # Ticket table
-            st.subheader("Recent Tickets")
-            st.dataframe(
-                filtered_df[["id", "category", "summary", "response"]].tail(20),
-                use_container_width=True,
-                height=500
-            )
-
-    # Refresh automatically
-    time.sleep(REFRESH_INTERVAL)
+    # Ticket table
+    st.subheader("Recent Tickets")
+    st.dataframe(
+        filtered_df[["id", "category", "summary", "response"]].tail(20),
+        use_container_width=True,
+        height=500
+    )

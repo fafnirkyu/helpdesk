@@ -3,8 +3,7 @@ import requests
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load credentials from your custom .enviorment file
-load_dotenv(Path(__file__).parent / ".enviorment")
+load_dotenv(Path(__file__).parent / ".env")
 
 ZENDESK_SUBDOMAIN = os.getenv("ZENDESK_SUBDOMAIN")
 ZENDESK_EMAIL = os.getenv("ZENDESK_EMAIL")
@@ -76,7 +75,7 @@ def post_test_comment(ticket_id: int):
 if __name__ == "__main__":
     print("🚀 Starting Zendesk API Test...\n")
     if not (ZENDESK_SUBDOMAIN and ZENDESK_EMAIL and ZENDESK_TOKEN):
-        print("❌ Missing environment variables. Please check your .enviorment file.")
+        print("❌ Missing environment variables. Please check your .env file.")
         exit(1)
 
     ok = test_connection()
