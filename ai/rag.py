@@ -25,7 +25,9 @@ if not os.path.exists("data/kb_embs.npz"):
     embs = EMBED_MODEL.encode(kb["instruction"].tolist(), convert_to_tensor=False)
     np.savez("data/kb_embs.npz", embs=embs)
 else:
-    embs = np.load("data/kb_embs.npz", mmap_mode='r')["embs"]
+    data = np.load("data/kb_embs.npz", mmap_mode='r')
+    print("Files in archive:", data.files)
+    embs = data[data.files[0]]
 
 kb = pd.read_csv(DATA_PATH)
 
