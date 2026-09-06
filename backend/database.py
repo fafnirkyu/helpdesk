@@ -2,13 +2,16 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = "/app/data"
-os.makedirs(DATA_DIR, exist_ok=True)
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = Path(os.getenv("DATA_DIR", PROJECT_DIR / "data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-DB_PATH = os.path.join(DATA_DIR, "helpdesk.db")
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+DB_PATH = DATA_DIR / "helpdesk.db"
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL", f"sqlite:///{DB_PATH.resolve().as_posix()}"
+)
 
 # IMPROVED: Much more robust SQLite configuration
 engine = create_engine(

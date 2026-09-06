@@ -1,111 +1,87 @@
-# 🤖 AI-Powered Helpdesk Automation System
+# AI Helpdesk Automation System
 
-### Developed by [Antonio Carlos Borges Neto](https://github.com/fafnirkyu)
+A portfolio project that demonstrates a Python backend for triaging support tickets with local AI assistance. The application accepts tickets through a FastAPI API, stores their lifecycle in SQLite, runs analysis in a background task, and exposes results in a Streamlit dashboard.
 
----
+> **Project status:** technical demonstration. The repository contains deployment notes from an AWS EC2 deployment; it is not presented as a currently operated customer-support service.
 
-## 📋 Overview
+## What it demonstrates
 
-This project is a **production-ready AI Helpdesk Automation System** deployed on **Amazon AWS**. It demonstrates a sophisticated full-stack integration designed to automate customer support workflows using local LLMs. 
+- **FastAPI + SQLAlchemy:** ticket creation, retrieval, validation, and SQLite persistence.
+- **Asynchronous work:** ticket analysis runs as a FastAPI background task, keeping ticket creation responsive.
+- **Local AI pipeline:** retrieval of relevant support examples, sentiment detection, local GGUF inference through `llama-cpp-python`, structured-output validation, and a keyword fallback when inference fails.
+- **Operational thinking:** retry/backoff logic, SQLite WAL configuration, rotating logs, and a stress-test script for the HTTP API.
+- **External integration:** a Zendesk adapter for fetching tickets and adding comments when credentials are configured.
+- **Deployment:** previously deployed on an Ubuntu AWS EC2 instance with PM2 managing the API and Streamlit dashboard.
 
-The system analyzes tickets, performs RAG-based knowledge retrieval, generates context-aware responses, and manages the entire lifecycle via a professional analytics dashboard.
+## Architecture
 
----
+```text
+Support ticket
+    |
+    v
+FastAPI API  -->  SQLite / SQLAlchemy
+    |
+    +--> Background analysis task
+            |
+            +--> retrieve relevant examples
+            +--> analyze sentiment
+            +--> local LLM classification
+            +--> validate structured response or use fallback
+    |
+    v
+Streamlit dashboard / optional Zendesk integration
+```
 
-## ⚙️ Architecture & Cloud Deployment
+## Technology
 
-The system is hosted on an **AWS EC2 (Ubuntu)** instance, utilizing a production-grade process management layer.
+Python, FastAPI, SQLAlchemy, SQLite, Streamlit, Plotly, NumPy, sentence-transformers, `llama-cpp-python`, PM2, AWS EC2, and the Zendesk REST API.
 
+## Local setup
 
+```bash
+git clone https://github.com/fafnirkyu/helpdesk.git
+cd helpdesk
+python -m venv .venv
+```
 
-### ☁️ DevOps & Optimization Highlights
+Activate the environment, install dependencies, and create your local configuration:
 
-Deploying AI to a memory-constrained **AWS t3.micro (1GB RAM)** required significant engineering:
+```bash
+pip install -r requirements.txt
+copy .env.example .env  # Windows PowerShell
+```
 
-* **Memory-Optimized RAG:** Loading 26,000+ vector entries normally exceeds 1GB RAM. I optimized this by using **NumPy Memory Mapping (`mmap_mode`)**, allowing the system to query the vector store directly from disk. This reduced startup time from **30 minutes to 5 seconds**.
-* **Process Management:** Utilized **PM2** to manage the FastAPI and Streamlit services, ensuring 24/7 uptime, auto-restart on failure, and log rotation.
-* **Production Networking:** Configured a custom Ubuntu environment to serve the API on privileged **Port 80** and secured the instance via **AWS Security Groups**.
+Set `MODEL_PATH` in `.env` to the location of your local GGUF model if you want inference enabled. Without a model, the application falls back to keyword-based categorization.
 
----
+Start the API:
 
-## 🚀 Key Features
+```bash
+uvicorn main:app --reload
+```
 
-### 🧠 AI Ticket Classification & RAG
+Then open `http://127.0.0.1:8000/docs` for the interactive API documentation. Start the dashboard separately:
 
-- **Core Engine:** Local inference using `llama3.2:3b` via Ollama for privacy and cost-efficiency.
-- **RAG Implementation:** Pulls top-k relevant historical instructions from a pre-calculated vector store to ground LLM responses in company truth.
-- **JSON Recovery:** Implementing regex-based recovery to ensure 100% valid JSON output even if the LLM adds conversational filler.
+```bash
+streamlit run dashboard.py
+```
 
-### 💬 Zendesk Integration
+## Zendesk configuration
 
-- **Auto-Processor:** A background service that polls the Zendesk REST API for new tickets and posts AI-generated responses.
-- **Realistic Simulation:** Includes a custom **Seeder** script to populate Zendesk with diverse test cases (billing, tech support, etc.) for demonstration.
+Zendesk integration is disabled by default. Add the following values to `.env` only when using a dedicated test account:
 
-### 📊 Streamlit Dashboard
+```env
+ZENDESK_ENABLED=false
+ZENDESK_SUBDOMAIN=
+ZENDESK_EMAIL=
+ZENDESK_TOKEN=
+```
 
-- **Real-time Analytics:** Track category distribution, sentiment trends, and AI confidence levels.
-- **Filtering & Sorting:** Interactive UI to drill down into specific ticket types and audit AI responses.
+## Known limitations
 
----
+- The application currently uses FastAPI background tasks rather than a durable queue; a production multi-worker deployment should use a task queue with persistent job state.
+- The project does not yet have a maintained automated unit/integration test suite or CI workflow.
+- Zendesk processing should use durable idempotency records before being enabled for customer-facing replies.
 
-## 🧠 Technical Highlights
+## Recruiter notes
 
-1. **Forced JSON Extraction:** Early iterations produced inconsistent outputs. I solved this by implementing structured validation and regex-based recovery, resulting in **100% valid JSON output** across all test cases.
-2. **Model Optimization:** Iteratively tested multiple models (`mistral:7b`, `llama3.1:8b`) before selecting **`llama3.2:3b`** as the perfect balance between accuracy and 1-2 second latency on micro-instances.
-3. **Robust Error Handling:** The system gracefully handles malformed API responses, connection timeouts, and database rollbacks during failed commits.
-
----
-
-## 🧱 Challenges & Lessons Learned
-
-| Challenge | Engineering Solution |
-| :--- | :--- |
-| **AWS Resource Constraints** | Optimized RAG to use pre-calculated `.npz` vector archives with disk-mapping. |
-| **Inconsistent LLM Output** | Implemented regex extraction and structured fallback logic. |
-| **Circular Imports** | Refactored the AI pipeline to use lazy-loading for heavy model components. |
-| **Realistic Simulation** | Built a Zendesk seeder to generate synthetic tickets for production testing. |
-
----
-
-## 🧪 Results
-
-- ✅ **100% Accuracy** across benchmark dataset for classification.
-- ⚡ **1-2 Second Latency** per ticket inference.
-- 💾 **Automated Sync** with local SQLite DB for historical auditing.
-- 💬 **Automatic Posting** confirmed live in Zendesk UI.
-
----
-
-## 🧰 Tech Stack
-
-- **Cloud:** Amazon AWS (EC2), PM2, Ubuntu Linux
-- **AI/ML:** Ollama (Llama 3.2), Sentence-Transformers, NumPy (Vector Search)
-- **Backend:** FastAPI, SQLAlchemy, Uvicorn, SQLite
-- **Frontend:** Streamlit, Plotly
-- **API:** Zendesk REST API
-
----
-
-## 🛠️ Installation & Production Setup
-
-1. **Clone & Install**
-   ```bash
-   git clone [https://github.com/fafnirkyu/helpdesk-ai.git](https://github.com/fafnirkyu/helpdesk-ai.git)
-   cd helpdesk-ai
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-2. **Run via PM2 (Production)**
-  ```bash
-  # Start the API on Port 80
-sudo pm2 start "venv/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 80" --name helpdesk-api
-
-# Start the Dashboard on Port 8501
-sudo pm2 start "venv/bin/python3 -m streamlit run dashboard.py --server.port 8501" --name helpdesk-dashboard
-  ```
-
-Author: Antonio Carlos Borges Neto
-
-Email: borgesneto.ag_@hotmail.com
+This repository is intentionally retained as a portfolio project because it demonstrates an end-to-end Python service: API design, persistence, background processing, local AI inference, error handling, observability, a dashboard, external API integration, and cloud deployment.

@@ -5,7 +5,7 @@ import time
 from backend import models
 from backend import database
 from ai.ai_pipeline import full_ticket_analysis
-from backend.integrations import zendesk, servicenow, freshdesk
+from backend.integrations import zendesk
 from sqlalchemy.orm import Session
 from tests.debug_logger import trace_function, log_debug
 

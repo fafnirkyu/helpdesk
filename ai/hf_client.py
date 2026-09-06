@@ -65,9 +65,18 @@ Context:
 Ticket: "{message}"
 Return ONLY a JSON object with: category, subcategory, summary, response."""
 
+    fallback = {
+        "category": "OTHER",
+        "subcategory": "general",
+        "summary": f"User reported: {message[:80]}",
+        "response": "Manual review needed.",
+    }
     raw = hf_generate(prompt)
     try:
         match = re.search(r"\{.*\}", raw, re.S)
-        return json.loads(match.group(0)) if match else {"category": "OTHER", "response": "Manual review needed."}
-    except:
-        return {"category": "OTHER", "response": "Parsing error."}
+        if not match:
+            return fallback
+        parsed = json.loads(match.group(0))
+        return {**fallback, **parsed}
+    except (json.JSONDecodeError, AttributeError):
+        return fallback

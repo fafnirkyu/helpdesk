@@ -1,0 +1,27 @@
+.env
+.env.*
+!.env.example
+
+# Python and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local environments and editor settings
+venv/
+.venv/
+backend/.venv/
+.vscode/
+
+# Runtime data, logs, and locally downloaded models
+logs/
+data/helpdesk.db
+models/
+*.gguf
+
+# Local deployment credentials
+*.pem
+
+# Historical local-only work
+redundant/
+HelpDeskEC2.pem
