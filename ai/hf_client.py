@@ -3,8 +3,10 @@ import os
 import json
 import re
 import time
+import logging
 from llama_cpp import Llama # Critical: pip install llama-cpp-python
-from tests.debug_logger import log_ai_request, log_ai_response
+
+logger = logging.getLogger(__name__)
 
 # Thread-safe Singleton for the Model
 _MODEL_LOCK = threading.Lock()
@@ -36,7 +38,7 @@ def hf_generate(prompt: str, max_tokens: int = 300) -> str:
         return "ERROR: Model not loaded"
 
     start = time.time()
-    log_ai_request(prompt, "llama-cpp", max_tokens)
+    logger.debug("Sending a request to the local llama-cpp model")
     
     try:
         # Generate response
@@ -48,10 +50,10 @@ def hf_generate(prompt: str, max_tokens: int = 300) -> str:
         )
         
         text = output["choices"][0]["text"].strip()
-        log_ai_response(text, time.time() - start, True)
+        logger.info("Local llama-cpp response completed in %.2fs", time.time() - start)
         return text
     except Exception as e:
-        log_ai_response(f"ERROR: {e}", time.time() - start, False)
+        logger.exception("Local llama-cpp request failed after %.2fs", time.time() - start)
         return f"ERROR: {e}"
 
 def classify_with_llm_detailed(message: str, examples: list) -> dict:

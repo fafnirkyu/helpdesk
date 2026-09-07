@@ -51,7 +51,7 @@ pip install -r requirements.txt
 copy .env.example .env  # Windows PowerShell
 ```
 
-Set `MODEL_PATH` in `.env` to the location of your local GGUF model if you want inference enabled. Without a model, the application falls back to keyword-based categorization.
+The default `AI_MODE=fallback` runs a fast keyword-based categorizer without downloading models. Set `AI_MODE=local_models` and configure `MODEL_PATH` only after downloading the optional embedding, sentiment, and GGUF model files.
 
 Start the API:
 

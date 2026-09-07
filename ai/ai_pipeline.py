@@ -1,4 +1,5 @@
 import time
+import os
 import re
 import unicodedata
 import threading
@@ -39,6 +40,11 @@ _analyzer = RobustAnalyzer()
 def full_ticket_analysis(ticket_text: str) -> dict:
     start = time.time()
     ticket_text = clean_text(ticket_text)
+
+    # Default to a fast, deterministic local path. Set AI_MODE=local_models only
+    # after downloading the optional embedding, sentiment, and GGUF model files.
+    if os.getenv("AI_MODE", "fallback").lower() == "fallback":
+        return _keyword_fallback(ticket_text)
     
     try:
         # Rate limiting
@@ -138,15 +144,15 @@ def _keyword_fallback(ticket_text: str) -> dict:
     category = _get_expected_category(text_lower)
     
     responses = {
-        "ACCOUNT": "I understand you're having account issues. Let me help you resolve this.",
-        "ORDER": "I see you have an order-related concern. Let me look into this for you.",
-        "BILLING": "I understand your billing concern. Let me check this for you.",
-        "SUBSCRIPTION": "I can help with your subscription question.",
-        "TECHNICAL": "I understand you're experiencing technical difficulties.",
-        "OTHER": "Thank you for your message. I'll help you with this."
+        "ACCOUNT": "Your account issue has been recorded for review. Please avoid sharing passwords or security codes.",
+        "ORDER": "Your order issue has been recorded and routed for review. Please share your order number or tracking reference so support can assist you.",
+        "BILLING": "Your billing concern has been recorded for review. Please do not share full card details in this ticket.",
+        "SUBSCRIPTION": "Your subscription request has been recorded and routed for review.",
+        "TECHNICAL": "Your technical issue has been recorded. Please include the affected device, browser, and any error message if available.",
+        "OTHER": "Your request has been recorded and routed for review."
     }
     
-    print(f"🔄 Using keyword fallback: {category}")
+    print(f"Using keyword fallback: {category}")
     
     return {
         "category": category,

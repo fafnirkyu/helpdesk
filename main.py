@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import backend.database as database
 from backend import schemas, service
-from tests.debug_logger import log_debug
+import logging
 import os
 
 load_dotenv(".env")
@@ -12,10 +12,11 @@ ZENDESK_EMAIL = os.getenv("ZENDESK_EMAIL")
 ZENDESK_TOKEN = os.getenv("ZENDESK_TOKEN")
 
 app = FastAPI(title="AI Helpdesk Assistant")
+logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 def on_startup():
-    log_debug("FastAPI starting up...")
+    logger.info("FastAPI starting up")
     # only initialize DB schema here. Do NOT analyze tickets by default.
     database.init_db()
 

@@ -7,14 +7,12 @@ from backend import database
 from ai.ai_pipeline import full_ticket_analysis
 from backend.integrations import zendesk
 from sqlalchemy.orm import Session
-from tests.debug_logger import trace_function, log_debug
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 
 # Create ticket with immediate commit
-@trace_function()
 def create_ticket(db: Session, ticket_create):
     """Create ticket with immediate commit."""
     db_ticket = models.Ticket(
@@ -28,11 +26,10 @@ def create_ticket(db: Session, ticket_create):
     db.commit()
     
     db.refresh(db_ticket)
-    log_debug(f"✅ Ticket {db_ticket.id} created successfully")
+    logger.info("Ticket %s created successfully", db_ticket.id)
     return db_ticket
 
 # Background analysis: create a fresh DB session here (BackgroundTasks / worker safe)
-@trace_function()
 def analyze_ticket_service(ticket_id: int):
     print(f"[Background Task] STARTING analysis for ticket {ticket_id}")
     
@@ -106,9 +103,9 @@ def _create_fallback_ticket(ticket_id: int):
             ticket.analyzed = True
             ticket.updated_at = datetime.now()
             db.commit()
-            log_debug(f"🔄 Fallback analysis for ticket {ticket_id}: {category}")
+            logger.info("Fallback analysis for ticket %s: %s", ticket_id, category)
     except Exception as e:
-        log_debug(f"💥 Even fallback failed for ticket {ticket_id}: {e}")
+        logger.exception("Fallback analysis failed for ticket %s: %s", ticket_id, e)
     finally:
         if db:
             db.close()
