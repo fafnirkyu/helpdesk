@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 st.title("📊 AI Helpdesk Dashboard")
-st.caption("Real-time monitoring of Zendesk ticket classification and AI responses")
+st.caption("Local ticket triage and analysis monitor")
 
 REFRESH_INTERVAL = st.sidebar.slider("Refresh interval (seconds)", 5, 120, 15)
 
